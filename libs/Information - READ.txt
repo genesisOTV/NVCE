@@ -1,0 +1,24 @@
+The main execute is called through verifManager.py or can be ran
+by calling the displayFeed() function and passing it a recognized outlet name.
+
+The latest headline is stored in sampleTxt.txt. This headline can be changed 
+(manually) to re-run all headlines in the RSS feed.
+
+Executing this will run the whole system: checking the provided feed for 
+new headlines and parsing/comparing/verifying any found. This will also 
+update the centralized reference of the outlet's RSS.
+
+The central reference can be found in the trendingHls json file, with the 
+individual outlet feeds being stored in the "TrendingHLs_Spec" dictionary. 
+This dictionary can be accessed to display current outlet-specific headlines.
+
+Examples of accessing JSON dictionaries through Python can be found in
+the updateTPHls() function on line 215 of the PHlLog_Limbo module if needed.
+
+No function exists currently to display recent outlet-specific headlines.
+
+
+
+For ideas, basic website functionality should include displaying current
+outlet-specific headlines and updating (refreshing) the RSS feeds periodically.
+Further additions are at your discretion

@@ -1,0 +1,69 @@
+*HlInfo*
+{
+	"Hls_Spec": {
+		"cnn": [],
+		"cnbc": [],
+		"fox": [],
+		"bbc": [],
+		"reuters": [],
+		"cna": [],
+		"msnbc": [],
+		"npr": [],
+		"nyt": [],
+		"atlantic": [],
+		"time": [],
+		"cbs": []
+	}, 
+
+	"ParsedHls_Limbo":{
+		"cnn": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"cnbc": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"fox": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"bbc": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"reuters": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"cna": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"msnbc": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"npr": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"nyt": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"atlantic": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"time": {"PHls": [], "Hls": [], "tHlsSpecInds": []},
+		"cbs": {"PHls": [], "Hls": [], "tHlsSpecInds": []}
+	},
+
+	"TrendingHls_General_pVerbs": {
+		"cnn": {},
+		"cnbc": {},
+		"fox": {},
+		"bbc": {},
+		"reuters": {},
+		"cna": {},
+		"npr": {},
+		"msnbc": {},
+		"nyt": {},
+		"atlantic": {},
+		"time": {}
+	}, 
+
+	"Hls_General_pNouns": {
+		"pNToC": {},
+		"hlArchive": []
+	}
+}
+
+
+*TrendingHls*
+{
+	"TrendingHls_Spec": {
+		"cnn": [],
+		"cnbc": [],
+		"fox": [],
+		"bbc": [],
+		"reuters": [],
+		"cna": [],
+		"msnbc": [],
+		"npr": [],
+		"nyt": [],
+		"atlantic": [],
+		"time": []
+	}
+}

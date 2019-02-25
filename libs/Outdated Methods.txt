@@ -1,0 +1,381 @@
+#Displays (10) most recent headlines from provided outlet RSS feed
+#def parseFeed(outlet):
+    #Parses provided feed
+    #rssFeed = rssFeeds[outlet]
+    #newHls = testRSSParser.checkFeed(rssFeed)
+
+    #Splits new headlines into regex format (See regex.py)
+    #pHlsPackage = [[], []]
+    #newPHls = []
+    #newPNs = []
+    #tempCoeffs_rtrn = []
+    #if newHls:
+        #for hl in newHls:
+            #print(hl)
+            
+            #parsedHl = regex.semParseHl(hl)
+            #newPHl = parseRtrns[0]
+            #pNouns = parseRtrns[1]
+
+            #print(newPHl)
+            #newPHls.append(parsedHl)
+            #newPNs.append(parsedHl[0])
+
+        #Rudimentary authentication
+        
+        #tempCoeffs_rtrn = authenticateHls(newPHls, HlpNouns, outlet)
+        
+    
+    #tempCoeffs_rtrn = verifRtrn[0]
+    #invalidHls = verifRtrn[1]
+
+    #print(invalidHls)
+
+    #hlInfoPackage = [outlet, newHls]
+    #pHlInfoPackage = [outlet, pHlsPackage, tempCoeffs_rtrn]
+
+    #Updates centralized instance of recent serialized headlines (JSON)
+    #updateFeed(hlInfoPackage)
+
+    #return [hlInfoPackage, pHlInfoPackage]
+    #return (newHls, newPHls, HlpNouns, tempCoeffs_rtrn)
+    #return(newHls, newPHls)
+
+
+
+def authenticateHls(PHls, pNs, source):
+    
+    tempCoeffs = []
+    nonTrendingHls = []
+    invalidHls = [[], []]
+    for i, Hl in enumerate(PHls):
+        #Compares provided headline to serialized trending headlines (See pHlLog_Limbo)
+        print(Hl)
+        rtrn = []
+        if(Hl[0]):
+            rtrn = pHlLog_Limbo.runPVSearch(Hl, source)
+        else:
+            rtrn = [False, False]
+        print(Hl)
+        
+        if(rtrn[0]):
+            print("Hl authenticated (1)")
+            coeff = 1
+        elif(not rtrn[0] and rtrn[1]):
+            #nonTrendingHls.append(Hl)
+            coeff = 0
+            print("No similar headlines detected (0): PV search failed")
+            print("Attempting pNoun search...")
+
+            hldrPack = [Hl, pNs[i]]
+            pNVerified = pHlLog_Limbo.runPNSearch(hldrPack, source)
+            if pNVerified:
+                coeff = 1
+            else:
+                nonTrendingHls.append(Hl)
+        else:
+            coeff = -1
+            print("Article headline type invalid")
+            #invalidHlPack = [Hl[2], pNs[i]]
+            #invalidHls.append(invalidHlPack)
+            invalidHls[0].append(Hl[2])
+            invalidHls[1].append(pNs[i])
+
+        if not tempCoeffs:
+            tempCoeffs = [coeff]
+        else:
+            tempCoeffs.insert(len(tempCoeffs), coeff)
+
+    if nonTrendingHls:
+        pHlLog_Limbo.updateTPHls(nonTrendingHls, source)
+
+    print(invalidHls)
+    if invalidHls:
+        searchThesaurus(invalidHls)
+    
+    return tempCoeffs
+
+
+
+
+def searchThesaurus(unIDedPack):
+    unIDedHls = unIDedPack[0]
+    HlPNs = unIDedPack[1]
+    print("THESAURUS CHECK")
+    print(HlPNs)
+    for pHl in unIDedHls:
+        foundPV = False
+        print(pHl)
+        for AP in pHl:
+            words = []
+            words = AP
+            print(AP)
+            
+            #if(len(AP) > 1):
+                #print(AP)
+                #words = list(AP)
+            #else:
+                #words = AP[0]
+            
+            for pNoun in HlPNs:
+                if pNoun in words:
+                    words.remove(pNoun)
+                    HlPNs.remove(pNoun)
+                    print("Word removed: "+ pNoun)
+            VSCandidates = []
+            isPVerb = False
+            baseWord = None
+            for word in words:
+                thWord = th.Word(word)
+                vSynonyms = thWord.synonyms('all', partOfSpeech=th.POS_VERB, allowEmpty=False)
+                if vSynonyms:
+                    print("Potential verb found: " + word)
+                    VSCandidates.append([word, vSynonyms])
+                    nSynonyms = thWord.synonyms('all', partOfSpeech=th.POS_NOUN, allowEmpty=False)
+                    if not nSynonyms:
+                        print("Nonambiguous verb found")
+                        VSCandidates = [[word, vSynonyms]]
+                        break
+            if VSCandidates:
+                candidate = VSCandidates[0][0]
+                vSynonyms = deArray(VSCandidates[0][1])
+                print(candidate)
+                print(vSynonyms)
+                inst = pvDict.PoserArrays()
+                for synonym in vSynonyms:
+                    serializedForm = inst.search_PVC(synonym)
+                    if serializedForm:
+                        isPVerb = True
+                        baseWord = serializedForm
+                        break
+                if isPVerb:
+                    foundPV = True
+                    inst.addWord([candidate, baseWord])
+                    print(candidate + ", " + baseWord)
+                    break
+                else:
+                    print("Base form not found of: " + candidate)
+                
+            if foundPV:
+                break
+
+        if not foundPV:
+            print("No verb found in headline")
+
+
+
+
+if oHls:
+            organizedHls[outlet] = oHls
+            organizedCoeffs[outlet] = oCoeffs
+        #hlInfo = hlPacks[0]
+        #organizedHls[outlet] = hlInfo[1]
+        #hlVerifInfo = hlPacks[1]
+        #organizedCoeffs[outlet] = hlVerifInfo[2]
+        #print("\n")
+        #print(hlPacks[1][2])
+        #print("\n")
+        #print("\n")
+        
+        if(i < (len(rssFeeds) - 1)):
+            #pHlInfo = hlVerifInfo[1]
+            #pHls = pHlInfo[0]
+            #pNouns = pHlInfo[1]
+
+            correctionIndicies[outlet] = []
+            for n, verifCoeff in enumerate(oCoeffs):
+                if(verifCoeff == 0):
+                    print(n)
+                    correctionIndicies[outlet].append(n)
+                    
+                    residualHl = [outlet, [[pHls[n]], [pNouns[n]]]]
+                    residualHls.append(residualHl)
+
+    print(organizedHls)
+    if organizedHls:
+        
+        print("Initial compilation/verification completed; running secondary verification")
+
+        secondaryCoeffs = []
+        for HlPack in residualHls:
+            secondaryCoeff = authenticateHls(HlPack[1], HlPack[0])
+            secondaryCoeffs.extend(secondaryCoeff)
+
+        output = [residualHls, secondaryCoeffs]
+        print("\n")
+        #print(output)
+
+        tally = 0
+        for site in correctionIndicies.keys():
+            revisedCoeffs = correctionIndicies[site]
+            #officialCoeffs = organizedCoeffs[site]
+            for index in revisedCoeffs:
+                #print(secondaryCoeffs[tally])
+                organizedCoeffs[site][index] = secondaryCoeffs[tally]
+                tally += 1
+            #tally += 1
+
+        finalPairedHls = []
+        for site in organizedHls.keys():
+            publishPack = [site, organizedHls[site], organizedCoeffs[site]]
+            updateFeed(publishPack)
+
+            finalPairedHls.append(publishPack)
+
+        print("\n")
+        print(finalPairedHls)
+
+
+
+
+def updateFeed(Package):
+    outlet = Package[0]
+    addedHls = Package[1]
+    verifFactors = Package[2]
+
+    #Pairing and formatting headlines and trust coeffs
+    pairedHls = []
+    unIDedHls = []
+    for i in range(len(addedHls)):
+        pairedEntry = [addedHls[i], verifFactors[i]]
+        pairedHls.append(pairedEntry)
+
+        if(verifFactors[i] == -1):
+            unIDedHls.append(addedHls[i])
+
+    #Lists problematic headlines
+    print("PVs not found in following headlines:")
+    print(unIDedHls)
+
+    #Updates centralized specified feed of headlines
+    tHls_read = json.load(open("trendingHls.json"))
+    releventHls = pairedHls
+    iteration = 0
+    if(len(addedHls) <= 5):
+        for i in range(len(tHls_read["TrendingHls_Spec"][outlet])):
+            releventHls.append(tHls_read["TrendingHls_Spec"][outlet][i])
+            iteration += 1
+
+            if(iteration >= 5):
+                break
+            
+    tHls_read["TrendingHls_Spec"][outlet] = releventHls
+    
+    with open("trendingHls.json", "w") as tHls_file:
+        json.dump(tHls_read, tHls_file)
+
+    print("Specified trending headline feed updated")
+
+
+
+
+#Assmebly/reformat of headlines (semantic parsing):
+    def build_FHl(self, HL):
+        FHL = [[], [], [[]]]
+        HlNouns = [[]]
+
+        seekingPV = True
+        foundPV = False
+        prePVAP = 1
+        for index, word in enumerate(HL):
+            #print(index)
+            isPV = True
+            isPC = False
+            baseWord = PoserArrays.search_PVC(self, word)
+            if not baseWord:
+                isPV = False
+                isPC = PoserArrays.search_PC(self, word)
+            if isPV:
+                if not foundPV:
+                    foundPV = True
+                    subject = []
+                    for AP in FHL[2]:
+                        subject.extend(AP)
+                        FHL[2] = [[]]
+                    subject.append(baseWord)
+                    FHL[1] = subject
+                    FHL[0] = [baseWord]
+                else:
+                    FHL[2][-1].append(baseWord)
+            elif isPC:
+                if FHL[2][-1]:
+                    FHL[2].append([])
+                    HlNouns.append([])
+            else:
+                FHL[2][-1].append(word)
+                HlNouns[-1].append(word)
+            
+            #If baseWord is not empty
+            Continue = False
+            if(seekingPV):
+                if baseWord:
+                    foundPV = True
+                    seekingPV = False
+                    #print("Bools updated")
+                    #FHL[0].append(baseWord)
+                    #for i in range(0, (index + 1)):
+                        #print("Subject : " + HL[i])
+                        #FHL[1].append(HL[i])
+                    #print("Subject : ")
+                    #print(FHL[1])
+                    #seekingPV = False
+                else:
+                    Continue = True
+                    #print("Continuing")
+                    
+            if(not seekingPV or Continue):
+                #if not foundPV:
+                if PoserArrays.search_PC(self, word) is True:
+                    #Add new empty array: creating new anchor point
+                    if not FHL[2] or FHL[2][-1]:
+                        FHL[2].append([])
+                        print("New anchor point added")
+                        if not seekingPV:
+                            HlNouns.append([])
+
+                        if(seekingPV):
+                            prePVAP += 1
+
+                    elif not FHL[2][-1]:
+                        print("Current anchor point still empty: no update needed")
+                    
+                    #print(len(FHL[2]))
+                elif baseWord:
+                    if(len(FHL[2]) == 0):
+                        FHL[2].append([])
+                    FHL[2][-1].append(baseWord)
+                else:
+                    if(len(FHL[2]) == 0):
+                        FHL[2].append([])
+                    #print(word)
+                    FHL[2][-1].append(word)
+                    if(len(HlNouns) > 1):
+                        HlNouns[-1].append(word)
+                    
+                if(foundPV):
+                    #print("Path reached")
+                    FHL[0].append(baseWord)
+                    #print(FHL[2][0])
+                    #FHL[2][0].append(baseWord)
+                    newSubject = []
+                    for i in range(prePVAP):
+                        print(FHL[2][i])
+                        newSubject.extend(FHL[2][i])
+                    
+                    print(newSubject)
+                    FHL[2] = [[]]
+                    FHL[1].extend(newSubject)
+
+                    del newSubject[-1]
+                    HlNouns.append(newSubject)
+                    HlNouns.append([])
+
+                    foundPV = False    
+        print(FHL)
+        
+        FHl_HlNouns = [FHL, HlNouns]
+        
+        return FHl_HlNouns
+
+
+

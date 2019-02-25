@@ -1,0 +1,14 @@
+<div>
+    {% verbatim %}
+    <div class="container-fluid" style="margin-top:30px">
+        <div class="row mb-2" v-for="source in sources">
+            <div class="col">
+                <a v-bind:href="source.url">{{ source.url }}</a>
+            </div>
+            <div class="col text-right">
+                <a @click="deleteSource(source.id)" class="text-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endverbatim %}
+</div>

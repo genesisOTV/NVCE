@@ -1,0 +1,38 @@
+{% extends 'feed/layout.html' %}
+{% block body %}
+<div class="jumbotron text-center" style="margin-bottom:0">
+        <h1>News Verification</h1>
+        <p>Resize this responsive page to see the effect!</p>
+</div>
+
+<div id="feed-app">
+    <!--Switch between sources page and controls page-->
+    <nav class="navbar navbar-expand-sm bg-light navbar-light">
+        <a class="navbar-brand" href="#">Fake Logo</a>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#sources" @click="setRoute('sources')">Sources</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#controls" @click="setRoute('controls')">Controls</a>
+            </li>
+        </ul>
+        <form class="form-inline">
+                <input type="text" v-model="newLink" placeholder="RSS source URL" class="form-control">
+                <button class="btn btn-success" @click="newSource">Save</button>
+        </form>
+    </nav>
+
+    <!--Routing-->
+    <div v-if="route == 'sources'"> {% include 'feed/sources.html' %} </div>
+    <div v-if="route == 'controls'"> {% include 'feed/control.html' %} </div>
+</div>
+
+<!--Load script-->
+{% load static %}
+<script type="application/javascript" src="{% static 'feed/app.js' %}"></script>
+<script type="application/javascript">
+window.addEventListener("load", function() {
+    feedApp.setup();
+});</script>
+{% endblock %}
